@@ -25,7 +25,7 @@ Current supported ONNX operators are found in the [operator support matrix](oper
 ### Download the code
 Clone the code from GitHub. 
 
-    git clone --recursive https://github.com/onnx/onnx-tensorrt.git
+    git clone --recursive https://github.com/XSeanLiu/onnx-tensorrt.git
 
 ### Building
 
