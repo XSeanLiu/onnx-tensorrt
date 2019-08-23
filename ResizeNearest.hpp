@@ -29,8 +29,8 @@
 #include <cassert>
 
 namespace {
-    constexpr const char* RESIZE_PLUGIN_VERSION{"001"};
-    constexpr const char* RESIZE_PLUGIN_NAME{"ResizeNearest"};
+    constexpr const char* RESIZE_NEAREST_PLUGIN_VERSION{"001"};
+    constexpr const char* RESIZE_NEAREST_PLUGIN_NAME{"ResizeNearest"};
 }
 
 class ResizeNearestPlugin final : public onnx2trt::PluginV2 {
@@ -60,13 +60,13 @@ public:
   ResizeNearestPlugin(void const* serialData, size_t serialLength) {
     this->deserialize(serialData, serialLength);
   }
-  virtual const char* getPluginType() const override { return RESIZE_PLUGIN_NAME; }
+  virtual const char* getPluginType() const override { return RESIZE_NEAREST_PLUGIN_NAME; }
 
   virtual void destroy() override { delete this; }
 
   virtual nvinfer1::IPluginV2* clone() const override { return new ResizeNearestPlugin{std::vector<float>(_scale, _scale + _ndims)}; }
 
-  virtual const char* getPluginVersion() const override { return RESIZE_PLUGIN_VERSION; }
+  virtual const char* getPluginVersion() const override { return RESIZE_NEAREST_PLUGIN_VERSION; }
 
   virtual void setPluginNamespace(const char* pluginNamespace) override {}
 
@@ -88,9 +88,9 @@ public:
 
   ~ResizeNearestPluginCreator() {}
 
-  const char* getPluginName() const { return RESIZE_PLUGIN_NAME; }
+  const char* getPluginName() const { return RESIZE_NEAREST_PLUGIN_NAME; }
 
-  const char* getPluginVersion() const { return RESIZE_PLUGIN_VERSION; }
+  const char* getPluginVersion() const { return RESIZE_NEAREST_PLUGIN_VERSION; }
 
   const nvinfer1::PluginFieldCollection* getFieldNames() { std::cerr<< "Function not implemented" << std::endl; return nullptr; }
 

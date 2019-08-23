@@ -25,6 +25,7 @@
 #include "plugin.hpp"
 #include "FancyActivation.hpp"
 #include "ResizeNearest.hpp"
+#include "ResizeBilinear.hpp"
 #include "Split.hpp"
 #include "InstanceNormalization.hpp"
 
@@ -931,7 +932,7 @@ DEFINE_BUILTIN_OP_IMPORTER(Dropout) {
   {
     RETURN_IDENTITY(inputs.at(0));
   }
-  else 
+  else
   {
     // Return both Dropout outputs: (output + mask)
     std::vector<TensorOrWeights> outputs;
@@ -1161,7 +1162,7 @@ DEFINE_BUILTIN_OP_IMPORTER(InstanceNormalization) {
   auto bias_weights  = inputs.at(2).weights();
   OnnxAttrs attrs(node);
   float epsilon = attrs.get("epsilon", 1e-5f);
-  // Lock maximum epislon value to 1e-4f. 
+  // Lock maximum epislon value to 1e-4f.
   epsilon = std::max(epsilon, 1e-4f);
   RETURN_FIRST_OUTPUT(
       ctx->addPluginV2(
@@ -1520,7 +1521,7 @@ DEFINE_BUILTIN_OP_IMPORTER(Reshape) {
       new_shape = set_dims_CHW(remove_dim(new_shape, BATCH_DIM));
       // Check for -1 dimension in new shape
       TRT_CHECK(get_infer_dim(infer_dim,new_shape));
-      
+
       if (infer_dim < 0) {
         ASSERT(get_shape_size(new_shape) ==
                    get_shape_size(tensor.getDimensions()),
@@ -2004,11 +2005,20 @@ DEFINE_BUILTIN_OP_IMPORTER(Upsample) {
       width_scale = scales[3];
     }
   }
+  auto mode = attrs.get<std::string>("mode");
   auto scale = {height_scale, width_scale};
-  auto mode = attrs.get<std::string>("mode", "nearest");
-  ASSERT(mode == "nearest", ErrorCode::kUNSUPPORTED_NODE);
-  RETURN_FIRST_OUTPUT(
-      ctx->addPluginV2(new ResizeNearestPlugin(scale), {&inputs.at(0).tensor()}));
+  //std::cout << "upsample methods is "<<mode<<std::endl;
+  //auto mode = attrs.get<std::string>("mode", "nearest");
+  //ASSERT(mode == "nearest", ErrorCode::kUNSUPPORTED_NODE);
+  if (mode == "linear")
+  {
+      bool align_corners = false;
+      RETURN_FIRST_OUTPUT(ctx->addPluginV2(new ResizeBilinearPlugin(scale, align_corners), {&inputs.at(0).tensor()}));
+  }
+  else if (mode == "nearest")
+  {
+      RETURN_FIRST_OUTPUT(ctx->addPluginV2(new ResizeNearestPlugin(scale), {&inputs.at(0).tensor()}));
+  }
 }
 
 } // namespace

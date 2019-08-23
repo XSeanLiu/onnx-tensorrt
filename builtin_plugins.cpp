@@ -25,6 +25,7 @@
 #include "PluginFactory.hpp"
 #include "FancyActivation.hpp"
 #include "ResizeNearest.hpp"
+#include "ResizeBilinear.hpp"
 #include "Split.hpp"
 #include "InstanceNormalization.hpp"
 
